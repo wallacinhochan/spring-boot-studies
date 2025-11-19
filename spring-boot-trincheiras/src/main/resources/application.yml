@@ -1,0 +1,14 @@
+spring:
+  application:
+    name : spring-boot-trincheiras
+  threads:
+    virtual:
+      enabled: true
+server:
+  servlet:
+    context-path: /
+  error:
+    include-stacktrace: on_param
+  tomcat:
+    threads:
+      max: 20
