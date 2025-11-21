@@ -7,7 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class SpringBootTrincheirasApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringBootTrincheirasApplication.class, args);
+        SpringApplication.run(SpringBootTrincheirasApplication.class, args);
+        System.out.println("Server on");
 	}
 
 }
