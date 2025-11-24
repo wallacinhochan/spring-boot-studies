@@ -5,8 +5,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import studies.wallace.domain.Producer;
+import studies.wallace.request.ProducerPostRequest;
+import studies.wallace.response.ProducerGetResponse;
 
-import java.awt.*;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -33,10 +35,22 @@ public class ProducerController {
     //Eu consigo tambem colocar headers obrigatorios! com headers no post e consigo pegar os heders no
     // escopo da função!
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Producer> saveProducer(@RequestBody Producer producer) {
-        if (producer == null) return null;
-        producer.setId(ThreadLocalRandom.current().nextLong(10000, 99999));
-        Producer.getProducers().add(producer);
-        return ResponseEntity.status(HttpStatus.CREATED).body(producer);
+    public ResponseEntity<ProducerGetResponse> saveProducer(@RequestBody ProducerPostRequest producerpostrequest) {
+        if (producerpostrequest == null) return null;
+        var prodecer = Producer
+                .builder()
+                .id(ThreadLocalRandom.current().nextLong(100_000))
+                .name(producerpostrequest.getName())
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        Producer.getProducers().add(prodecer);
+
+        var producerGetResponse = ProducerGetResponse
+                .builder()
+                .id(prodecer.getId()).name(prodecer.getName())
+                .createdAt(prodecer.getCreatedAt())
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(producerGetResponse);
     }
 }
