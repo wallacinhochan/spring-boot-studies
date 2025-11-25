@@ -5,16 +5,17 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import studies.wallace.domain.Producer;
+import studies.wallace.mapper.ProducerMapper;
 import studies.wallace.request.ProducerPostRequest;
 import studies.wallace.response.ProducerGetResponse;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
 @RequestMapping("v1/producer")
 public class ProducerController {
+    private static final ProducerMapper MAPPER = ProducerMapper.INSTANCE;
+
     @GetMapping
     public List<Producer> listAllProducer(@RequestParam(required = false) String name) {
         var producerList = Producer.getProducers();
@@ -37,20 +38,13 @@ public class ProducerController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ProducerGetResponse> saveProducer(@RequestBody ProducerPostRequest producerpostrequest) {
         if (producerpostrequest == null) return null;
-        var prodecer = Producer
-                .builder()
-                .id(ThreadLocalRandom.current().nextLong(100_000))
-                .name(producerpostrequest.getName())
-                .createdAt(LocalDateTime.now())
-                .build();
 
-        Producer.getProducers().add(prodecer);
+        var producer = MAPPER.toProducer(producerpostrequest);
 
-        var producerGetResponse = ProducerGetResponse
-                .builder()
-                .id(prodecer.getId()).name(prodecer.getName())
-                .createdAt(prodecer.getCreatedAt())
-                .build();
+        Producer.getProducers().add(producer);
+
+        var producerGetResponse = MAPPER.toProducerGetResponse(producer);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(producerGetResponse);
     }
 }
