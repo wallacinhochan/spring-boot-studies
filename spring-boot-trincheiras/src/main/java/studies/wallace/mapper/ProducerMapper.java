@@ -7,6 +7,8 @@ import studies.wallace.domain.Producer;
 import studies.wallace.request.ProducerPostRequest;
 import studies.wallace.response.ProducerGetResponse;
 
+import java.util.List;
+
 @Mapper
 public interface ProducerMapper {
     ProducerMapper INSTANCE = Mappers.getMapper(ProducerMapper.class);
@@ -16,4 +18,6 @@ public interface ProducerMapper {
     Producer toProducer(ProducerPostRequest producerpostrequest);
 
     ProducerGetResponse toProducerGetResponse(Producer producer);
+
+    List<ProducerGetResponse> toProducerGetResponseList(List<Producer> producers);
 }

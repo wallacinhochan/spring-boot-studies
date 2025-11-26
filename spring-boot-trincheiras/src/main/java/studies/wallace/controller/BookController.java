@@ -12,7 +12,7 @@ import java.util.List;
 @Slf4j
 public class BookController {
     @GetMapping
-    public List<String> listAll(){
+    public List<String> listAll() {
         log.info(Thread.currentThread().getName());
         return List.of("Lord of the rings", "Dom Casmurro", "Moreninha");
     }

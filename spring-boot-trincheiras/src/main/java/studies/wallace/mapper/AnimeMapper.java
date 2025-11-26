@@ -1,9 +1,10 @@
 package studies.wallace.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import studies.wallace.domain.Anime;
-import studies.wallace.domain.Producer;
+import studies.wallace.request.AnimePostRequest;
 import studies.wallace.response.AnimeGetResponse;
 
 import java.util.List;
@@ -15,4 +16,7 @@ public interface AnimeMapper {
     AnimeGetResponse toAnimeGetResponse(Anime anime);
 
     List<AnimeGetResponse> toAnimeGetResponseList(List<Anime> animes);
+
+    @Mapping(target = "id", expression = "java(java.util.concurrent.ThreadLocalRandom.current().nextLong(100_000))")
+    Anime toAnime(AnimePostRequest animepostrequest);
 }

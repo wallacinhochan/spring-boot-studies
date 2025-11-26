@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import studies.wallace.domain.Producer;
 import studies.wallace.mapper.ProducerMapper;
 import studies.wallace.request.ProducerPostRequest;
@@ -17,20 +18,27 @@ public class ProducerController {
     private static final ProducerMapper MAPPER = ProducerMapper.INSTANCE;
 
     @GetMapping
-    public List<Producer> listAllProducer(@RequestParam(required = false) String name) {
+    public ResponseEntity<List<ProducerGetResponse>> listAllProducer(@RequestParam(required = false) String name) {
         var producerList = Producer.getProducers();
-        if (name == null) return producerList;
-        return producerList.stream().filter(producer -> producer.getName().equalsIgnoreCase(name)).toList();
+        var producerGetResponsList = MAPPER.toProducerGetResponseList(producerList);
+
+        if (name == null) return ResponseEntity.ok(producerGetResponsList);
+
+        var filter = producerGetResponsList.stream().filter(producer -> producer.getName().equalsIgnoreCase(name)).toList();
+
+        return ResponseEntity.ok(filter);
     }
 
     @GetMapping("{id}")
-    public Producer listAllProducer(@PathVariable Long id) {
-
-        return Producer.getProducers()
-                .stream()
+    public ResponseEntity<ProducerGetResponse> findByID(@PathVariable Long id) {
+        var producers = Producer.getProducers();
+        var produrcersGetResponse = MAPPER.toProducerGetResponseList(producers);
+        var response = produrcersGetResponse.stream()
                 .filter(producer -> producer.getId().equals(id)).
                 findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Content not found"));
+        if (response == null) return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(response);
     }
 
     //Eu consigo tambem colocar headers obrigatorios! com headers no post e consigo pegar os heders no
@@ -46,5 +54,16 @@ public class ProducerController {
         var producerGetResponse = MAPPER.toProducerGetResponse(producer);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(producerGetResponse);
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteByID(@PathVariable Long id) {
+        var producerToDelete = Producer.getProducers().stream()
+                .filter(producer -> producer.getId().equals(id)).
+                findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Content not found"));
+
+        Producer.getProducers().remove(producerToDelete);
+        return ResponseEntity.noContent().build();
     }
 }
