@@ -7,6 +7,7 @@ import org.springframework.web.server.ResponseStatusException;
 import studies.wallace.domain.Anime;
 import studies.wallace.mapper.AnimeMapper;
 import studies.wallace.request.AnimePostRequest;
+import studies.wallace.request.AnimePutRequest;
 import studies.wallace.response.AnimeGetResponse;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 @RequestMapping("v1/animes")
 public class AnimeController {
     private static final AnimeMapper MAPPER = AnimeMapper.INSTANCE;
+    private static final String CONTENT_NOT_FIND_MENSAGE = "Content not found";
 
     @GetMapping
     public ResponseEntity<List<AnimeGetResponse>> listAllAnime(@RequestParam(required = false) String name) {
@@ -38,7 +40,7 @@ public class AnimeController {
                 .stream()
                 .filter(animes -> animes.getId().equals(id)).
                 findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Content not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, CONTENT_NOT_FIND_MENSAGE));
 
         if (filter == null) return ResponseEntity.noContent().build();
 
@@ -60,13 +62,28 @@ public class AnimeController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteAnime(@RequestParam Long id) {
+    public ResponseEntity<Void> deleteAnime(@PathVariable Long id) {
         var animeToDelete = Anime.getAnimes().stream()
                 .filter(anime -> anime.getId().equals(id)).
                 findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Content not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, CONTENT_NOT_FIND_MENSAGE));
 
         Anime.getAnimes().remove(animeToDelete);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<Void> updateAnime(@RequestBody AnimePutRequest animePutRequest, @PathVariable Long id) {
+
+        var animeToRemove = Anime.getAnimes().stream()
+                .filter(anime -> anime.getId().equals(id)).
+                findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, CONTENT_NOT_FIND_MENSAGE));
+
+        var animeToUpdate = MAPPER.toAnime(animePutRequest);
+        Anime.getAnimes().remove(animeToRemove);
+        Anime.getAnimes().add(animeToUpdate);
+
         return ResponseEntity.noContent().build();
     }
 

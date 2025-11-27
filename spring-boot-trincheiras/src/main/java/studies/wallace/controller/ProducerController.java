@@ -8,6 +8,7 @@ import org.springframework.web.server.ResponseStatusException;
 import studies.wallace.domain.Producer;
 import studies.wallace.mapper.ProducerMapper;
 import studies.wallace.request.ProducerPostRequest;
+import studies.wallace.request.ProducerPutRequest;
 import studies.wallace.response.ProducerGetResponse;
 
 import java.util.List;
@@ -64,6 +65,20 @@ public class ProducerController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Content not found"));
 
         Producer.getProducers().remove(producerToDelete);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<Void> updateByID(@PathVariable Long id, @RequestBody ProducerPutRequest producerputrequest) {
+        var producerToDelete = Producer.getProducers().stream()
+                .filter(producer -> producer.getId().equals(id)).
+                findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Content not found"));
+
+        var producer = MAPPER.toProducer(producerputrequest, producerToDelete.getCreatedAt());
+        Producer.getProducers().remove(producerToDelete);
+        Producer.getProducers().add(producer);
+
         return ResponseEntity.noContent().build();
     }
 }

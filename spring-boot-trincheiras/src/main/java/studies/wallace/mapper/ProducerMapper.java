@@ -5,8 +5,10 @@ import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import studies.wallace.domain.Producer;
 import studies.wallace.request.ProducerPostRequest;
+import studies.wallace.request.ProducerPutRequest;
 import studies.wallace.response.ProducerGetResponse;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -16,6 +18,10 @@ public interface ProducerMapper {
     @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "id", expression = "java(java.util.concurrent.ThreadLocalRandom.current().nextLong(100_000))")
     Producer toProducer(ProducerPostRequest producerpostrequest);
+
+    @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "id", expression = "java(java.util.concurrent.ThreadLocalRandom.current().nextLong(100_000))")
+    Producer toProducer(ProducerPutRequest producerputrequest, LocalDateTime createdAt);
 
     ProducerGetResponse toProducerGetResponse(Producer producer);
 
